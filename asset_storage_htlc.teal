@@ -1,0 +1,83 @@
+
+//  Transaction Fee - TMPL_FEE: maximum fee used by the limit order transaction. 10000
+//  Recived Address - TMPL_RCV: BKJX2U52PKL27XS42VO4SJW5BBFBYDCN7NYAW6BUEKF7EBYX5XV5CKAPT4
+//  Sender Address  - TMPL_OWN: 36WZVNA6YA77V2MGGLJBT2YQG3RQVX6UWJ3P6E7FWNAV4IGMK3ZVVNBLVQ
+
+// Checking that the fee of this transaction is less than or equal to an amount
+txn Fee
+int 10000
+<=
+
+// Checking whether this is a payment transaction
+txn TypeEnum
+int 1
+==
+
+// Initating Key Registration
+txn TypeEnum
+int 2
+==
+
+// Initiating the Asset Registration
+txn TypeEnum
+int 3
+==
+
+// Folding above checks into a single boolean
+&&
+
+// Checking whether the Receiver field is empty 
+// Folding this result into the above checks
+
+txn Receiver
+global ZeroAddress
+==
+&&
+
+// Checking that the amount of algos transferred is 0
+// Transactions that close out are only allowed
+
+txn Amount
+int 0
+==
+&&
+
+// We will now check the two payment scenarios
+// Scenario 1 - Checking whether the hash preimage is revealed
+// Checking the received address setting
+
+txn CloseRemainderTo
+addr BKJX2U52PKL27XS42VO4SJW5BBFBYDCN7NYAW6BUEKF7EBYX5XV5CKAPT4
+==
+
+arg_0
+sha256
+
+byte base64 QzYhq9JlYbn2QdOMrhyxVlNtNjeyvyJc/I8d8VAGfGc=
+==
+
+&&
+
+// Scenario 2 - Contract has timed out
+// Checking the field is set to the Owner address
+
+txn CloseRemainderTo
+addr 36WZVNA6YA77V2MGGLJBT2YQG3RQVX6UWJ3P6E7FWNAV4IGMK3ZVVNBLVQ
+==
+
+// Checking the transaction time-out
+txn FirstValid
+int 6666
+>
+
+// Initiating the Asset Freeze
+txn TypeEnum
+int 5
+==
+
+// Folding into a boolean transaction
+&&
+
+// Final Checks
+||
+&&
